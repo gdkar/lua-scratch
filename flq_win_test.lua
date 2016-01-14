@@ -2,10 +2,10 @@
 local q, qput, qget, qlen, qcount
 
 local function pre(count,irand,srand)
-    local Q = require 'flqueue'
-    q = Q(0)
+    local Q = require 'fl.flqueue'
+    q = Q()
     qput, qget, qlen, qcount = q.put, q.get, q.len, count
-    for i = 1,(count/16) do qput(irand[i]) end
+    for i = 1,math.min(16,count/16) do qput(irand[i]) end
 end
 
 local function loop(i, irand, srand) qput(qget()) end

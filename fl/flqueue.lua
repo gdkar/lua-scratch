@@ -15,22 +15,28 @@ local Q = setmetatable({},{ __call = function(q, size)
         data[tail]  = item
         qlst[tail]  = idx
         tail        = idx
-        qlen       = qlen + 1
+        qlen        = qlen + 1
     end
     local function get()
-        if head == tail then return nil end
-        local idx,item  = head, data[head]
-        data[idx],head,qlst[idx] = nil, qlst[idx], 0
-        fput(idx)
-        qlen = qlen - 1
-        return item
+        if head ~= tail then
+            local idx,item  = head, data[head]
+            data[idx],head,qlst[idx] = nil, qlst[idx], 0
+            fput(idx)
+            qlen = qlen - 1
+            return item
+        end
     end
     local function peek()
         if head ~= tail then return data[head] end
     end
+    local function qnext(q,idx)
+        if idx == nil then idx = head end
+        if idx ~= tail then return qlst[idx], data[idx] end
+    end
     local function len() return qlen end
+    local function iter() return qnext, nil, head end
     for i = 1,size do qlst[i], data[i] = 0, 0 end
-    return setmetatable({ data = data, put  = put, peek=peek,get  = get, len = len },{ __len = len, __call = get})
+    return setmetatable({ data = data, put  = put, peek=peek,get  = get, next = qnext, iter = iter, len = len },{ __len = len, __call = get})
 end})
 function Q.put(fl,idx) fl.put(idx) end
 function Q.get(fl) return fl.get() end

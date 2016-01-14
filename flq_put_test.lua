@@ -3,7 +3,7 @@ local q, qput, qget, qlen, qcount
 
 local function pre(count,irand,srand)
     local Q = require 'flqueue'
-    q = Q(count)
+    q = Q()
     qput, qget, qlen, qcount = q.put, q.get, q.len, count
 end
 

@@ -1,4 +1,3 @@
-
 local require = require
 local ffi, bit = require 'ffi', require 'bit'
 

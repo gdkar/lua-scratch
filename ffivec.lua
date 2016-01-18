@@ -6,7 +6,7 @@ local new, typeof, cdef, cast, sizeof, gc = ffi.new,ffi.typeof, ffi.cdef, ffi.ca
 
 cdef [[
 typedef struct Vec {
-    int *ptr;
+    int    *ptr;
     size_t  vsize;
     size_t  dsize;
 }Vec;
@@ -22,9 +22,8 @@ local intp       = typeof("int*")
 local function resize(self,size)
     local dsize = self.dsize
     if size > dsize then
-        if dsize == 0 then dsize = 16 end
         while size > dsize do dsize = dsize * 2 end
-        local ptr = ffi.cast(intp,realloc(self.ptr,dsize * sizeof_int))
+        local ptr = realloc(self.ptr,dsize * sizeof_int)
         if ptr then
             self.ptr = ptr
             self.dsize = dsize
@@ -38,7 +37,7 @@ local Vec = ffi.metatype(typeof("Vec"),{
         if sz < 16 then sz = 16 end
         local self = ffi.new(vec)
         self.vsize = vsz
-        self.dsize =  0
+        self.dsize = 16
         resize(self,vsz)
         return self
     end,
@@ -46,20 +45,12 @@ local Vec = ffi.metatype(typeof("Vec"),{
         return self.vsize
     end,
     __index = function(self, key)
-        local idx = key - 1
-        if idx < self.vsize then return self.ptr[idx] end
+        return self.ptr[key- 1]
     end,
     __newindex = function(self,key,val)
-        local idx = key - 1
-        if idx >= self.vsize then
-            resize(self, idx + 1)
-            if idx < self.dsize then
-                self.vsize = idx + 1
-            end
-        end
-        if 0 <= idx and idx < self.dsize then
-            self.ptr[idx] = val
-        end
+        if key > self.vsize then resize(self, key+ 1) end
+        if key > self.dsize then self.dsize = key end
+        if key <= self.dsize then self.ptr[key-1] = val end
     end,
     __gc = function(self)
         free(self.ptr)

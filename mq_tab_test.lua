@@ -10,9 +10,9 @@ local function pre(count,irand,srand)
 end
 
 local function loop(i, irand, srand)
-    local arg = irand[band(i,(2^18)-1)]
+    local arg = irand[i]
     if qlen() > 2^16 or band(arg,15) > 8 then
-        qput(arg)
+        qput({arg,arg})
     else
         qget()
     end

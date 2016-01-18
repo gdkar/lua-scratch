@@ -10,24 +10,64 @@ local Q = setmetatable({},{ __call = function(q, size)
     local head = fget()
     local tail = head
 
-    local function put(item)
-        local idx  = fget()
-        data[tail]  = item
-        qlst[tail]  = idx
-        tail        = idx
-        qlen        = qlen + 1
+    local function put(...)
+        for i = 1,select('#',...) do
+            local item = select(i,...)
+            local idx  = fget()
+            data[tail],qlst[tail],tail  = item,idx,idx
+            qlen        = qlen + 1
+        end
     end
     local function get()
         if head ~= tail then
-            local idx,item  = head, data[head]
-            data[idx],head,qlst[idx] = nil, qlst[idx], 0
-            fput(idx)
+            fput(head)
+            local item  = data[head]
+            data[head],head,qlst[head] = nil, qlst[head], 0
             qlen = qlen - 1
             return item
         end
     end
-    local function peek()
+
+    local function pop()
+         if head ~= tail then
+            fput(head)
+            data[head],head,qlst[head] = nil, qlst[head], 0
+            qlen = qlen - 1
+            return true
+        end
+    end
+    local function front()
         if head ~= tail then return data[head] end
+    end
+    local function drop(item)
+        if not item then return end
+        if front() == item then return pop() end
+        local idx, nxt = head, qlst[head]
+        while nxt ~= tail do
+            if data[nxt] == item then
+                qlst[idx],data[nxt], qlst[nxt] = qlst[nxt],nil, 0
+                qlen = qlen - 1
+                return true
+            else idx,nxt = nxt,qlst[nxt] end
+        end
+    end
+    local function remove(item)
+        if not item then return end
+        local found = 0
+        while front() == item do
+            data[head],head,qlst[head] = nil, qlst[head],0
+            found = found + 1
+        end
+        local idx, nxt = head, qlst[head]
+        while nxt ~= tail do
+            if data[nxt] == item then
+                qlst[idx] = qlst[nxt]
+                data[nxt], qlst[nxt] = nil, 0
+                qlen = qlen - 1
+                found = found + 1
+            else idx,nxt = nxt,qlst[nxt] end
+        end
+        return found
     end
     local function qnext(q,idx)
         if idx == nil then idx = head end
@@ -36,7 +76,7 @@ local Q = setmetatable({},{ __call = function(q, size)
     local function len() return qlen end
     local function iter() return qnext, nil, head end
     for i = 1,size do qlst[i], data[i] = 0, 0 end
-    return setmetatable({ data = data, put  = put, peek=peek,get  = get, next = qnext, iter = iter, len = len },{ __len = len, __call = get})
+    return setmetatable({ data = data, drop=drop, put  = put, front=front,get  = get, next = qnext, iter = iter, len = len },{ __len = len, __call = get})
 end})
 function Q.put(fl,idx) fl.put(idx) end
 function Q.get(fl) return fl.get() end

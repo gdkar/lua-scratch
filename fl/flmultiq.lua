@@ -81,18 +81,21 @@ local make_q_src = function(nq)
 ]]
     return src
 end
-local queues = setmetatable({ Q },{ __index = function(qs, nq)
+local queues = setmetatable({ Q },{
+__index = function(qs, nq)
     local src = make_q_src(nq)
     local chunk, err = loadstring(src, "q"..nq)
     if not chunk then
         print(err)
         return
     end
-    local status,Q     = pcall(chunk, nq, fl, vec)
+    local status,Q   = pcall(chunk, nq, fl, vec)
     if not status then print(src, Q)
     else rawset(qs, nq, Q) end
     return rawget(qs,nq)
 end,
+__call = function(qs, nq,...)
+    return qs[nq](...)
+end,
 })
-
 return queues

@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
-#include <stdatomic.h>
+//#include <stdatomic.h>
 
 typedef struct Vec {
     size_t  item_size;

@@ -4,7 +4,7 @@ local bit = require'bit'
 local band = bit.band
 
 local function pre(count,irand,srand)
-    local Q = require 'flqueue'
+    local Q = (require 'fl').TQ[1]
     q = Q()
     qput, qget, qlen, qcount = q.put, q.get, q.len, count
 end

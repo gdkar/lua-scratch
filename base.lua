@@ -4,18 +4,18 @@ local ffi,bit = require'ffi',require'bit'
 local to, new = ffi.typeof,ffi.new
 local sprintf = string.format
 local printf  = function(...) io.write(sprintf(...)) end
-local clock = os.clock
-
+local sys = require'syscall'
+local clock = function() return tonumber(sys.clock_gettime(sys.c.CLOCK.REALTIME).time)  end
 local count = tonumber(select(1,...) or 2^16)
-local reps  = tonumber(select(2,...) or 16)
-local tests = {select(3,...)}
+local reps  = 2
+local tests = {select(2,...)}
 
 math.randomseed(os.clock())
-local irand = new("int[?]",math.min(count,(2^18)-1))
+local irand = new("int[?]",(2^18))
 local srand = { }
 do
-    for i = 1,math.min(count,(2^18)-1)do irand[i] = math.random(2^24-1) end
---    for i = 1,#irand do srand[i] = sprintf("%#x",irand[i]) end
+    for i = 0,(2^18) - 1 do irand[i] = math.random(2^24-1) end
+    for i = 1,(2^18) do srand[i] = sprintf("%#x",irand[i-1]) end
 end
 do
     for i,name in ipairs(tests) do

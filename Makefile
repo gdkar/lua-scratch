@@ -10,7 +10,7 @@ OPTFLAGS += -fomit-frame-pointer -ffast-math -I. -fPIC -DPIC -fno-math-errno \
 
 CFLAGS += -std=gnu11 $(OPTFLAGS) $(CPPFLAGS)
 CXXFLAGS += -std=gnu++14 $(OPTFLAGS) $(CPPFLAGS) -Wno-c++11-narrowing -lstdc++ $(shell pkg-config --cflags Qt5Core Qt5Gui)
-LDFLAGS:=$(shell pkg-config --libs --cflags sdl2 glew glfw3 Qt5Core Qt5Gui)  -L/lib/x86_64-linux-gnu -lm -lstdc++ -lportaudio $(shell pkg-config --libs Qt5Core Qt5Gui) -lOpenCL $(shell pkg-config --libs --cflags libavutil libavdevice libavformat libavcodec libavfilter libswresample )
+LDFLAGS:=$(shell pkg-config --libs --cflags sdl2 glew glfw3 Qt5Core Qt5Gui)  -L/lib/x86_64-linux-gnu -lm -lstdc++ -lportaudio $(shell pkg-config --libs Qt5Core Qt5Gui)  $(shell pkg-config --libs --cflags libavutil libavdevice libavformat libavcodec libavfilter libswresample )
 
 EXTRA_OBJS:= 
 
